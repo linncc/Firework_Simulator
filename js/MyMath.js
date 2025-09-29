@@ -1,11 +1,8 @@
 /*
-Copyright © 2022 NianBroken. All rights reserved.
+此源码是基于 XgpNwb 的二次修改
 Github：https://github.com/NianBroken/Firework_Simulator
 Gitee：https://gitee.com/nianbroken/Firework_Simulator
-本项目采用 Apache-2.0 许可证
-简而言之，你可以自由使用、修改和分享本项目的代码，但前提是在其衍生作品中必须保留原始许可证和版权信息，并且必须以相同的许可证发布所有修改过的代码。
 */
-
 const MyMath = (function MyMathFactory(Math) {
 	const MyMath = {};
 
@@ -22,7 +19,7 @@ const MyMath = (function MyMathFactory(Math) {
 
 	// Pythagorean Theorem point distance calculation
 	// Same as above, but takes coordinates instead of dimensions.
-	// This project is copyrighted by NianBroken!
+	// The language of this project was translated into Chinese by Nianbroken
 	MyMath.pointDist = (x1, y1, x2, y2) => {
 		const distX = x2 - x1;
 		const distY = y2 - y1;
@@ -77,15 +74,36 @@ const MyMath = (function MyMathFactory(Math) {
 		var ctx = canvas.getContext("2d");
 
 		var font = `${fontSize} ${fontFamily}`;
-
 		ctx.font = font;
-		var width = ctx.measureText(text).width;
-		var fontSize = parseInt(fontSize.match(/(\d+)px/)[1]);
-		canvas.width = width + 20;
-		canvas.height = fontSize + 20;
+		
+		// 分割多行文本
+		var lines = text.split('\n');
+		var fontSizeNum = parseInt(fontSize.match(/(\d+)px/)[1]);
+		var lineHeight = fontSizeNum * 1.2; // 行高为字体大小的1.2倍
+		
+		// 计算总宽度和高度
+		var maxWidth = 0;
+		lines.forEach(line => {
+			var width = ctx.measureText(line).width;
+			if (width > maxWidth) maxWidth = width;
+		});
+		
+		var totalHeight = lines.length * lineHeight;
+		
+		canvas.width = maxWidth + 20;
+		canvas.height = totalHeight + 20;
 
+		// 设置字体并清除画布
 		ctx.font = font;
-		ctx.fillText(text, 10, fontSize + 10);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+		// 绘制每一行文本
+		lines.forEach((line, index) => {
+			var y = 10 + fontSizeNum + (index * lineHeight);
+			var lineWidth = ctx.measureText(line).width;
+			var x = (canvas.width - lineWidth) / 2;
+			ctx.fillText(line, x, y);
+		});
 
 		// 获取画布上的像素数据
 		var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -101,22 +119,17 @@ const MyMath = (function MyMathFactory(Math) {
 			}
 		}
 
-		// //清除画布,将dots 中的每个点绘制到画布上
+		// 调试用：显示生成的点阵图像
 		// ctx.clearRect(0, 0, canvas.width, canvas.height);
 		// ctx.fillStyle = 'red';
 		// dots.forEach(function (dot) {
 		//     ctx.fillRect(dot.x, dot.y, 1, 1);
 		// });
-
-		// // 创建img元素,填充canvas图像内容 并添加到新窗口body
 		// var img = document.createElement('img');
 		// img.src = canvas.toDataURL();
 		// img.style.width = canvas.width + 'px';
 		// img.style.height = canvas.height + 'px';
 		// document.body.appendChild(img);
-		// window.open().document.body.appendChild(img);
-
-		//canvas 导出为图片
 
 		return {
 			width: canvas.width,
